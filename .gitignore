@@ -1,2 +1,5 @@
 *.swp
+
+# Generated files
+jlox
 build/
