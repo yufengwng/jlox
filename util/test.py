@@ -28,8 +28,7 @@ num_skipped = 0
 expectations = 0
 
 interpreter = None
-# TODO: make this a comma separated list
-filter_path = None
+filter_paths = None
 
 
 class Interpreter:
@@ -327,9 +326,14 @@ def run_script(path):
         return
 
     # Check if we are just running a subset of the tests.
-    if filter_path:
+    if filter_paths:
         this_test = relpath(path, join(REPO_DIR, TEST_DIR))
-        if not this_test.startswith(filter_path):
+        matched_filter = False
+        for filter_path in filter_paths:
+            if this_test.startswith(filter_path):
+                matched_filter = True
+                break
+        if not matched_filter:
             return
 
     # Make a nice short path relative to the working directory.
@@ -390,14 +394,14 @@ def run_suite():
 
 
 def main(argv):
-    global filter_path
+    global filter_paths
 
     if len(argv) < 1 or len(argv) > 2:
-        print('Usage: test.py [filter]')
+        print('Usage: test.py [filters]')
         sys.exit(1)
 
     if len(argv) == 2:
-        filter_path = argv[1]
+        filter_paths = argv[1].split(',')
 
     if not run_suite():
         sys.exit(1)

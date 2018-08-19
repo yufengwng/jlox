@@ -22,8 +22,8 @@ $(BUILD_DIR)/%.class: $(SRC_DIR)/%.java
 	javac -d $(BUILD_DIR) $(JAVAC_OPTS) $<
 
 test: jlox
-ifdef FILTER
-	@ python3 util/test.py $(FILTER)
+ifdef FILTERS
+	@ python3 util/test.py $(FILTERS)
 else
 	@ python3 util/test.py
 endif
