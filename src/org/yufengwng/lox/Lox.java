@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class Lox {
     private static final int EX_DATAERR = 64;
@@ -26,6 +27,8 @@ public class Lox {
     }
 
     private static void run(String source) {
-        System.out.println("nil");
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scan();
+        tokens.forEach(t -> System.out.println(t.toDisplay()));
     }
 }
