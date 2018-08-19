@@ -1,5 +1,5 @@
 *.swp
 
 # Generated files
-jlox
+spec/
 build/

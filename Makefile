@@ -1,18 +1,19 @@
 SRC_DIR := src
+TEST_DIR := spec
 BUILD_DIR := build
 
 SOURCES := $(wildcard $(SRC_DIR)/org/yufengwng/lox/*.java)
 CLASSES := $(addprefix $(BUILD_DIR)/, $(SOURCES:$(SRC_DIR)/%.java=%.class))
 
-EXE := jlox
 MAIN := org.yufengwng.lox.Lox
-
 JAVAC_OPTS := -Werror
 
 
 default: jlox
 
-jlox: compile jar exe
+jlox: compile
+	@ cd $(BUILD_DIR) && jar cfe jlox.jar $(MAIN) *
+	@ printf 'Built jar: $(BUILD_DIR)/jlox.jar\n'
 
 compile: $(CLASSES)
 
@@ -20,17 +21,23 @@ $(BUILD_DIR)/%.class: $(SRC_DIR)/%.java
 	@ mkdir -p $(BUILD_DIR)
 	javac -d $(BUILD_DIR) $(JAVAC_OPTS) $<
 
-jar:
-	@ cd $(BUILD_DIR) && jar cfe $(EXE).jar $(MAIN) *
-	@ printf 'Built jar: $(BUILD_DIR)/$(EXE).jar\n'
+test: jlox
+ifdef FILTER
+	@ python3 util/test.py $(FILTER)
+else
+	@ python3 util/test.py
+endif
 
-exe:
-	@ printf '#!/usr/bin/env bash\njava -jar $(BUILD_DIR)/$(EXE).jar "$$@"\n' > $(EXE)
-	@ chmod +x $(EXE)
-	@ printf 'Generated executable script: $(EXE)\n'
+test_load:
+	git clone https://github.com/munificent/craftinginterpreters ci
+	mv ci/test $(TEST_DIR)
+	rm -rf ci
+
+test_clean:
+	rm -rf $(TEST_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) $(EXE)
+	rm -rf $(BUILD_DIR)
 
 
-.PHONY: compile clean default exe jar jlox
+.PHONY: compile clean default jlox test test_clean test_load
