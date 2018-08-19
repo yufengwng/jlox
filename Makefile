@@ -19,7 +19,7 @@ compile: $(CLASSES)
 
 $(BUILD_DIR)/%.class: $(SRC_DIR)/%.java
 	@ mkdir -p $(BUILD_DIR)
-	javac -d $(BUILD_DIR) $(JAVAC_OPTS) $<
+	javac -cp $(SRC_DIR) -d $(BUILD_DIR) $(JAVAC_OPTS) $<
 
 test: jlox
 ifdef FILTERS
