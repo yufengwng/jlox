@@ -39,7 +39,7 @@ class Interpreter:
         self.tests = tests
 
 
-def jlox_interpreter():
+def init_interpreter():
     tests = {
         TEST_DIR: 'pass',
 
@@ -47,7 +47,7 @@ def jlox_interpreter():
         TEST_DIR + '/scanning': 'skip',
         TEST_DIR + '/expressions': 'skip',
 
-        # No hardcoded limits in jlox.
+        # No hardcoded limits in java version of lox.
         TEST_DIR + '/limit/loop_too_large.lox': 'skip',
         TEST_DIR + '/limit/no_reuse_constants.lox': 'skip',
         TEST_DIR + '/limit/too_many_constants.lox': 'skip',
@@ -57,9 +57,9 @@ def jlox_interpreter():
         # Rely on JVM for stack overflow checking.
         TEST_DIR + '/limit/stack_overflow.lox': 'skip',
     }
-    args = [join(REPO_DIR, 'jlox')]
-    jlox = Interpreter('jlox', 'java', args, tests)
-    return jlox
+    args = [join(REPO_DIR, 'loxscript')]
+    loxscript = Interpreter('loxscript', 'java', args, tests)
+    return loxscript
 
 
 class Test:
@@ -374,7 +374,7 @@ def run_suite():
     global num_skipped
     global expectations
 
-    interpreter = jlox_interpreter()
+    interpreter = init_interpreter()
 
     passed = 0
     failed = 0

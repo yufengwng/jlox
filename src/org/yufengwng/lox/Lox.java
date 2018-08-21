@@ -7,12 +7,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
+    private static final String NAME = "loxscript";
     private static final int EX_DATAERR = 64;
     private static final int EX_SOFTWARE = 70;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.out.println("Usage: jlox [script]");
+            System.out.println(String.format("Usage: %s [script]", NAME));
             System.exit(EX_DATAERR);
         } else if (args.length == 1) {
             runFile(args[0]);
