@@ -28,8 +28,8 @@ public class Lox {
     }
 
     private static void run(String source) {
-        Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.scan();
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.scan();
         tokens.forEach(t -> System.out.println(t.toDisplay()));
     }
 }

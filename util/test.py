@@ -358,6 +358,8 @@ def run_script(path):
     # Display the results.
     if len(test.failures) == 0:
         passed += 1
+        # print_line(green('PASS') + ': ' + path)
+        # print('')
     else:
         failed += 1
         print_line(red('FAIL') + ': ' + path)

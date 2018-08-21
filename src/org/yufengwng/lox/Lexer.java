@@ -3,7 +3,7 @@ package org.yufengwng.lox;
 import java.util.ArrayList;
 import java.util.List;
 
-class Scanner {
+class Lexer {
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
 
@@ -11,7 +11,7 @@ class Scanner {
     private int current = 0;
     private int line = 1;
 
-    Scanner(String source) {
+    Lexer(String source) {
         this.source = source;
     }
 
