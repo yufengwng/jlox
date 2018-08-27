@@ -1,5 +1,7 @@
 package org.yufengwng.lox;
 
+import static org.yufengwng.lox.TokenType.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,35 +22,35 @@ class Lexer {
             start = current;
             scanToken();
         }
-        tokens.add(new Token(TokenType.EOF, null, "", line));
+        tokens.add(new Token(EOF, null, "", line));
         return tokens;
     }
 
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(TokenType.PAREN_L); break;
-            case ')': addToken(TokenType.PAREN_R); break;
-            case '{': addToken(TokenType.BRACE_L); break;
-            case '}': addToken(TokenType.BRACE_R); break;
-            case ',': addToken(TokenType.COMMA); break;
-            case ';': addToken(TokenType.SEMI); break;
-            case '.': addToken(TokenType.DOT); break;
+            case '(': addToken(PAREN_L); break;
+            case ')': addToken(PAREN_R); break;
+            case '{': addToken(BRACE_L); break;
+            case '}': addToken(BRACE_R); break;
+            case ',': addToken(COMMA); break;
+            case ';': addToken(SEMI); break;
+            case '.': addToken(DOT); break;
 
-            case '!': addToken(match('=') ? TokenType.NOT_EQ : TokenType.BANG); break;
-            case '=': addToken(match('=') ? TokenType.EQ_EQ : TokenType.EQ); break;
-            case '<': addToken(match('=') ? TokenType.LESS_EQ : TokenType.LESS); break;
-            case '>': addToken(match('=') ? TokenType.GREATER_EQ : TokenType.GREATER); break;
+            case '!': addToken(match('=') ? NOT_EQ : BANG); break;
+            case '=': addToken(match('=') ? EQ_EQ : EQ); break;
+            case '<': addToken(match('=') ? LESS_EQ : LESS); break;
+            case '>': addToken(match('=') ? GREATER_EQ : GREATER); break;
 
-            case '+': addToken(TokenType.PLUS); break;
-            case '-': addToken(TokenType.MINUS); break;
-            case '*': addToken(TokenType.STAR); break;
+            case '+': addToken(PLUS); break;
+            case '-': addToken(MINUS); break;
+            case '*': addToken(STAR); break;
 
             case '/':
                 if (match('/')) {
                     finishLineComment();
                 } else {
-                    addToken(TokenType.SLASH);
+                    addToken(SLASH);
                 }
                 break;
 
@@ -144,7 +146,7 @@ class Lexer {
             advance();
         }
         String text = currentLexeme();
-        TokenType type = TokenType.KEYWORDS.getOrDefault(text, TokenType.IDENT);
+        TokenType type = KEYWORDS.getOrDefault(text, IDENT);
         addToken(type, null, text);
     }
 
@@ -154,7 +156,7 @@ class Lexer {
         }
         tryFraction();
         String text = currentLexeme();
-        addToken(TokenType.NUM, toLoxNumber(text), text);
+        addToken(NUM, toLoxNumber(text), text);
     }
 
     private void tryFraction() {
@@ -183,7 +185,7 @@ class Lexer {
         }
 
         String text = currentLexeme();
-        addToken(TokenType.STR, toLoxString(text), text);
+        addToken(STR, toLoxString(text), text);
     }
 
     private boolean closeString() {

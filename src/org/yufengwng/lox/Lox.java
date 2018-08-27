@@ -30,6 +30,11 @@ public class Lox {
     private static void run(String source) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scan();
-        tokens.forEach(t -> System.out.println(t.toDisplay()));
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+
+        Interpreter interpreter = new Interpreter();
+        interpreter.interpret(statements);
     }
 }
