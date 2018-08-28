@@ -7,9 +7,8 @@ import java.util.List;
 
 class Parser {
 
-    private static class ParseError extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-    }
+    @SuppressWarnings("serial")
+    private static class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
     private int current = 0;
@@ -29,7 +28,8 @@ class Parser {
     private Stmt tryDeclaration() {
         try {
             return statement();
-        } catch (ParseError ignored) {
+        } catch (ParseError error) {
+            synchronize();
             return null;
         }
     }
@@ -133,8 +133,7 @@ class Parser {
             return new Expr.Grouping(expr);
         }
 
-        // throw error
-        throw new ParseError();
+        throw error(peek(), "Expect expression.");
     }
 
     private boolean isAtEnd() {
@@ -174,6 +173,31 @@ class Parser {
         if (check(type)) {
             return advance();
         }
-        throw new RuntimeException(); // error
+        throw error(peek(), message);
+    }
+
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    }
+
+    // Synchronize parsing on statement boundaries.
+    private void synchronize() {
+        advance();
+        while (!isAtEnd()) {
+            if (previous().type == SEMI) return;
+            switch (peek().type) {
+                case CLASS:
+                case FOR:
+                case FUN:
+                case IF:
+                case PRINT:
+                case RETURN:
+                case VAR:
+                case WHILE:
+                    return;
+            }
+            advance();
+        }
     }
 }

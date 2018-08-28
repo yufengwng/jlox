@@ -1,11 +1,14 @@
 package org.yufengwng.lox;
 
 import java.util.List;
+import java.util.Objects;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     public void interpret(List<Stmt> statements) {
-        statements.forEach(stmt -> execute(stmt));
+        statements.stream()
+            .filter(Objects::nonNull)
+            .forEach(stmt -> execute(stmt));
     }
 
     private void execute(Stmt stmt) {

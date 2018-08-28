@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Lexer {
+
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
 
@@ -72,7 +73,7 @@ class Lexer {
                 } else if (isAlpha(c)) {
                     finishIdentifier();
                 } else {
-                    // report error
+                    Lox.error(line, "Unexpected character.");
                 }
                 break;
         }
@@ -190,7 +191,8 @@ class Lexer {
 
     private boolean closeString() {
         if (isAtEnd()) {
-            return false;     // report error
+            Lox.error(line, "Unterminated string.");
+            return false;
         } else {
             advance();
             return true;
