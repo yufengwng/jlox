@@ -1,7 +1,6 @@
 package org.yufengwng.lox;
 
 abstract class Stmt {
-
     interface Visitor<R> {
         R visitExpressionStmt(Expression stmt);
         R visitPrintStmt(Print stmt);

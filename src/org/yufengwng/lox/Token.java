@@ -13,14 +13,14 @@ class Token {
         this.line = line;
     }
 
-    // Get a string representation that satisfies original lox expectations.
-    public String toDisplay() {
-        return String.format("%s %s %s", type.toDisplay(), lexeme, literal);
-    }
-
     @Override
     public String toString() {
         return String.format("Token{type=%s,literal=%s,lexeme=%s,line=%d}",
                 type, literal, lexeme, line);
+    }
+
+    // Get a string representation that satisfies original lox expectations.
+    public String toDisplay() {
+        return String.format("%s %s %s", type.toDisplay(), lexeme, literal);
     }
 }

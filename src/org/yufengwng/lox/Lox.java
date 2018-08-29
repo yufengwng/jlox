@@ -15,6 +15,8 @@ public class Lox {
     private static final int EX_DATAERR = 65;
     private static final int EX_SOFTWARE = 70;
 
+    private static final Interpreter interpreter = new Interpreter();
+
     private static boolean hadError = false;
     private static boolean hadRuntimeError = false;
 
@@ -42,8 +44,13 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         while (true) {
-            System.out.print("lx> ");
-            run(reader.readLine());
+            System.out.print("> ");
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+
+            run(line);
             hadError = false;
         }
     }
@@ -56,7 +63,6 @@ public class Lox {
         List<Stmt> statements = parser.parse();
         if (hadError) return;
 
-        Interpreter interpreter = new Interpreter();
         interpreter.interpret(statements);
     }
 
