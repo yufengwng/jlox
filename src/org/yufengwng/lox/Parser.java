@@ -47,10 +47,22 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(BRACE_L)) {
+            return new Stmt.Block(finishBlockStatement());
+        }
         if (match(PRINT)) {
             return printStatement();
         }
         return expressionStatement();
+    }
+
+    private List<Stmt> finishBlockStatement() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd() && !check(BRACE_R)) {
+            statements.add(tryDeclaration());
+        }
+        consume(BRACE_R, "Expect '}' after block.");
+        return statements;
     }
 
     private Stmt printStatement() {

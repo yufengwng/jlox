@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
-    private Environment earth = new Environment();
+    private Environment current = new Environment();
 
     public void interpret(List<Stmt> statements) {
         try {
@@ -22,6 +22,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    private void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.current;
+        try {
+            this.current = environment;
+            statements.stream()
+                .filter(Objects::nonNull)
+                .forEach(stmt -> execute(stmt));
+        } finally {
+            this.current = previous;
+        }
+    }
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(current));
+        return null;
     }
 
     @Override
@@ -43,14 +61,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
         }
-        earth.define(stmt.name.lexeme, value);
+        current.define(stmt.name.lexeme, value);
         return null;
     }
 
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        earth.assign(expr.name, value);
+        current.assign(expr.name, value);
         return value;
     }
 
@@ -118,7 +136,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return earth.fetch(expr.name);
+        return current.fetch(expr.name);
     }
 
     private boolean isEqual(Object a, Object b) {
