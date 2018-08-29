@@ -9,16 +9,12 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
-
     private static final String NAME = "loxscript";
     private static final int EX_USAGE = 64;
     private static final int EX_DATAERR = 65;
     private static final int EX_SOFTWARE = 70;
 
     private static final Interpreter interpreter = new Interpreter();
-
-    private static boolean hadError = false;
-    private static boolean hadRuntimeError = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -35,8 +31,8 @@ public class Lox {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
 
-        if (hadError)        System.exit(EX_DATAERR);
-        if (hadRuntimeError) System.exit(EX_SOFTWARE);
+        if (Reporter.errored())        System.exit(EX_DATAERR);
+        if (Reporter.runtimeErrored()) System.exit(EX_SOFTWARE);
     }
 
     private static void runPrompt() throws IOException {
@@ -51,7 +47,7 @@ public class Lox {
             }
 
             run(line);
-            hadError = false;
+            Reporter.reset();
         }
     }
 
@@ -61,32 +57,8 @@ public class Lox {
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
-        if (hadError) return;
+        if (Reporter.errored()) return;
 
         interpreter.interpret(statements);
-    }
-
-    static void error(int line, String message) {
-        report(line, "", message);
-    }
-
-    static void error(Token token, String message) {
-        if (token.type == TokenType.EOF) {
-            report(token.line, " at end", message);
-        } else {
-            report(token.line, " at '" + token.lexeme + "'", message);
-        }
-    }
-
-    static void runtimeError(RuntimeError error) {
-        System.err.println(String.format(
-                    "%s\n[line %d]", error.getMessage(), error.token.line));
-        hadRuntimeError = true;
-    }
-
-    private static void report(int line, String where, String message) {
-        System.err.println(String.format(
-                    "[line %d] Error%s: %s", line, where, message));
-        hadError = true;
     }
 }

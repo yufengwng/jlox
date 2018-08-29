@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Objects;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
-
     public void interpret(List<Stmt> statements) {
         try {
             statements.stream()
                 .filter(Objects::nonNull)
                 .forEach(stmt -> execute(stmt));
         } catch (RuntimeError error) {
-            Lox.runtimeError(error);
+            Reporter.runtimeError(error);
         }
     }
 

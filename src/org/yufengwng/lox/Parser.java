@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
-
     @SuppressWarnings("serial")
     private static class ParseError extends RuntimeException {}
 
@@ -177,7 +176,7 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Lox.error(token, message);
+        Reporter.error(token, message);
         return new ParseError();
     }
 

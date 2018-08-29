@@ -72,7 +72,7 @@ class Lexer {
                 } else if (isAlpha(c)) {
                     finishIdentifier();
                 } else {
-                    Lox.error(line, "Unexpected character.");
+                    Reporter.error(line, "Unexpected character.");
                 }
                 break;
         }
@@ -190,7 +190,7 @@ class Lexer {
 
     private boolean closeString() {
         if (isAtEnd()) {
-            Lox.error(line, "Unterminated string.");
+            Reporter.error(line, "Unterminated string.");
             return false;
         } else {
             advance();
