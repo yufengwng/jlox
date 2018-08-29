@@ -26,11 +26,24 @@ class Parser {
 
     private Stmt tryDeclaration() {
         try {
+            if (match(VAR)) return finishVarDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt finishVarDeclaration() {
+        Token name = consume(IDENT, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQ)) {
+            initializer = expression();
+        }
+
+        consume(SEMI, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
     }
 
     private Stmt statement() {
@@ -54,6 +67,24 @@ class Parser {
 
     private Expr expression() {
         return equality();
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if (match(EQ)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     private Expr equality() {

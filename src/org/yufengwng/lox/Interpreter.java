@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
+    private Environment earth = new Environment();
+
     public void interpret(List<Stmt> statements) {
         try {
             statements.stream()
@@ -33,6 +35,23 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+        earth.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        earth.assign(expr.name, value);
+        return value;
     }
 
     @Override
@@ -99,7 +118,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return null; // todo: lookup name in environment scope
+        return earth.fetch(expr.name);
     }
 
     private boolean isEqual(Object a, Object b) {
