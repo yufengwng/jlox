@@ -57,9 +57,9 @@ def init_interpreter():
         # Rely on JVM for stack overflow checking.
         TEST_DIR + '/limit/stack_overflow.lox': 'skip',
     }
-    args = [join(REPO_DIR, 'loxscript')]
-    loxscript = Interpreter('loxscript', 'java', args, tests)
-    return loxscript
+    args = [join(REPO_DIR, 'jlox')]
+    jlox = Interpreter('jlox', 'java', args, tests)
+    return jlox
 
 
 class Test:

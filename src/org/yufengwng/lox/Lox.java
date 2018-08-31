@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
-    private static final String NAME = "loxscript";
+    private static final String NAME = "jlox";
     private static final int EX_USAGE = 64;
     private static final int EX_DATAERR = 65;
     private static final int EX_SOFTWARE = 70;

@@ -1,8 +1,7 @@
-### LoxScript
+### jlox
 
 A toy implementation of the Lox language from the [Crafting
-Interpreters][ci-book] book, with tiny differences. The language itself is
-very similar to [echo 'loxscript' | sed 's/lox/java/'].
+Interpreters][ci-book] book, with tiny differences.
 
 \# getting started
 
