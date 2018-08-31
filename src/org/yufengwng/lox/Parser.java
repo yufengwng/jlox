@@ -3,6 +3,7 @@ package org.yufengwng.lox;
 import static org.yufengwng.lox.TokenType.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Parser {
@@ -47,12 +48,11 @@ class Parser {
     }
 
     private Stmt statement() {
-        if (match(BRACE_L)) {
-            return new Stmt.Block(finishBlockStatement());
-        }
-        if (match(PRINT)) {
-            return printStatement();
-        }
+        if (match(BRACE_L)) return new Stmt.Block(finishBlockStatement());
+        if (match(FOR))     return finishForStatement();
+        if (match(IF))      return finishIfStatement();
+        if (match(PRINT))   return finishPrintStatement();
+        if (match(WHILE))   return finishWhileStatement();
         return expressionStatement();
     }
 
@@ -65,10 +65,78 @@ class Parser {
         return statements;
     }
 
-    private Stmt printStatement() {
+    private Stmt finishForStatement() {
+        consume(PAREN_L, "Expect '(' after 'for'.");
+
+        Stmt initializer;
+        if (match(SEMI)) {
+            initializer = null;
+        } else if (match(VAR)) {
+            initializer = finishVarDeclaration();
+        } else {
+            initializer = expressionStatement();
+        }
+
+        Expr condition = null;
+        if (!check(SEMI)) {
+            condition = expression();
+        }
+        consume(SEMI, "Expect ';' after for loop condition.");
+
+        Expr increment = null;
+        if (!check(PAREN_R)) {
+            increment = expression();
+        }
+        consume(PAREN_R, "Expect ')' after for loop clauses.");
+
+        Stmt body = statement();
+        body = desugarForToWhile(initializer, condition, increment, body);
+
+        return body;
+    }
+
+    private Stmt desugarForToWhile(Stmt init, Expr cond, Expr incr, Stmt body) {
+        if (incr != null) {
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(incr)));
+        }
+
+        if (cond == null) cond = new Expr.Literal(true);
+        body = new Stmt.While(cond, body);
+
+        if (init != null) {
+            body = new Stmt.Block(Arrays.asList(init , body));
+        }
+
+        return body;
+    }
+
+    private Stmt finishIfStatement() {
+        consume(PAREN_L, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(PAREN_R, "Expect ')' after if condition.");
+
+        Stmt then = statement();
+        Stmt otherwise = null;
+        if (match(ELSE)) {
+            otherwise = statement();
+        }
+
+        return new Stmt.If(condition, then, otherwise);
+    }
+
+    private Stmt finishPrintStatement() {
         Expr value = expression();
         consume(SEMI, "Expect ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private Stmt finishWhileStatement() {
+        consume(PAREN_L, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(PAREN_R, "Expect ')' after while condition.");
+
+        Stmt body = statement();
+        return new Stmt.While(condition, body);
     }
 
     private Stmt expressionStatement() {
@@ -78,11 +146,11 @@ class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
     }
 
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = logicalOr();
 
         if (match(EQ)) {
             Token equals = previous();
@@ -94,6 +162,30 @@ class Parser {
             }
 
             error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr logicalOr() {
+        Expr expr = logicalAnd();
+
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = logicalAnd();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr logicalAnd() {
+        Expr expr = equality();
+
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
         }
 
         return expr;
