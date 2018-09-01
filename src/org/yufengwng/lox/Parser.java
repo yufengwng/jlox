@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 class Parser {
+    private static final int MAX_ARITY = 8;
+
     @SuppressWarnings("serial")
     private static class ParseError extends RuntimeException {}
 
@@ -245,7 +247,35 @@ class Parser {
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expr = primary();
+
+        while (true) {
+            if (match(PAREN_L)) {
+                expr = finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(PAREN_R)) {
+            do {
+                if (arguments.size() >= MAX_ARITY) {
+                    error(peek(), "Cannot have more than " + MAX_ARITY + " arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+        Token paren = consume(PAREN_R, "Expect ')' after arguments.");
+        return new Expr.Call(callee, paren, arguments);
     }
 
     private Expr primary() {
