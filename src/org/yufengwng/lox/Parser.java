@@ -15,6 +15,15 @@ class Parser {
     private final List<Token> tokens;
     private int current = 0;
 
+    private enum FunParseType {
+        FUNCTION, METHOD;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
+
     Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
@@ -29,12 +38,34 @@ class Parser {
 
     private Stmt tryDeclaration() {
         try {
+            if (match(FUN)) return function(FunParseType.FUNCTION);
             if (match(VAR)) return finishVarDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt function(FunParseType funType) {
+        Token name = consume(IDENT, "Expect " + funType + " name.");
+        consume(PAREN_L, "Expect '(' after " + funType + " name.");
+
+        List<Token> parameters= new ArrayList<>();
+        if (!check(PAREN_R)) {
+            do {
+                if (parameters.size() >= MAX_ARITY) {
+                    error(peek(), "Cannot have more than " + MAX_ARITY + " parameters.");
+                }
+                parameters.add(consume(IDENT, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+
+        consume(PAREN_R, "Expect ')' after parameters.");
+        consume(BRACE_L, "Expect '{' before " + funType + " body.");
+
+        List<Stmt> body = finishBlockStatement();
+        return new Stmt.Function(name, parameters, body);
     }
 
     private Stmt finishVarDeclaration() {
@@ -54,6 +85,7 @@ class Parser {
         if (match(FOR))     return finishForStatement();
         if (match(IF))      return finishIfStatement();
         if (match(PRINT))   return finishPrintStatement();
+        if (match(RETURN))  return finishReturnStatement();
         if (match(WHILE))   return finishWhileStatement();
         return expressionStatement();
     }
@@ -130,6 +162,16 @@ class Parser {
         Expr value = expression();
         consume(SEMI, "Expect ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private Stmt finishReturnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMI)) {
+            value = expression();
+        }
+        consume(SEMI, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt finishWhileStatement() {
