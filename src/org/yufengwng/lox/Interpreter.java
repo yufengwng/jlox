@@ -226,7 +226,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 return !isTruthy(value);
             case MINUS:
                 checkNumberOperand(expr.operator, value);
-                return (0.0 - (double) value);
+                return - (double) value;
         }
         throw new RuntimeError(expr.operator, "Unhandled unary expression.");
     }
