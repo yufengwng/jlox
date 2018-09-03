@@ -18,6 +18,6 @@ class NativeClock implements LoxCallable {
 
     @Override
     public String toString() {
-        return "<native fn clock>";
+        return "<native fn>";
     }
 }
