@@ -1,11 +1,15 @@
 package org.yufengwng.lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
-    final Environment globals = new Environment();
+    private final Environment globals = new Environment();
+    private final Map<Expr, Integer> locals = new HashMap<>();
+
     private Environment current = globals;
 
     Interpreter() {
@@ -40,6 +44,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         } finally {
             this.current = previous;
         }
+    }
+
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 
     @Override
@@ -108,7 +116,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        current.assign(expr.name, value);
+
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            current.assignAt(distance, expr.name, value);
+        } else {
+            globals.assign(expr.name, value);
+        }
+
         return value;
     }
 
@@ -212,7 +227,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return current.fetch(expr.name);
+        return lookupVariable(expr.name, expr);
+    }
+
+    private Object lookupVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return current.fetchAt(distance, name.lexeme);
+        } else {
+            return globals.fetch(name);
+        }
     }
 
     private boolean isEqual(Object a, Object b) {
