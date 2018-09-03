@@ -13,7 +13,9 @@ JAVAC_OPTS := -Werror
 default: jlox
 
 # Compile classes and build the jar.
-jlox: compile
+jlox: $(BUILD_DIR)/$(NAME).jar
+
+$(BUILD_DIR)/$(NAME).jar: $(CLASSES)
 	@ cd $(BUILD_DIR) && jar cfe $(NAME).jar $(MAIN) *
 	@ printf 'Built jar: $(BUILD_DIR)/$(NAME).jar\n'
 
