@@ -23,7 +23,7 @@ compile: $(CLASSES)
 
 $(BUILD_DIR)/%.class: $(SRC_DIR)/%.java
 	@ mkdir -p $(BUILD_DIR)
-	javac -cp $(SRC_DIR) -d $(BUILD_DIR) $(JAVAC_OPTS) $<
+	javac -source 1.8 -target 1.8 -cp $(SRC_DIR) -d $(BUILD_DIR) $(JAVAC_OPTS) $<
 
 # Run interpreter against test suite with optional filters.
 test: jlox
