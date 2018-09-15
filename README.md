@@ -1,7 +1,10 @@
 ### jlox
 
-A toy implementation of the Lox language from the [Crafting
+Yet another implementation of the Lox language from the [Crafting
 Interpreters][ci-book] book, with tiny differences.
+
+[![Build Status](https://travis-ci.org/yufengwng/jlox.svg?branch=master)](
+https://travis-ci.org/yufengwng/jlox)
 
 \# getting started
 
