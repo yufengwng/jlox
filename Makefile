@@ -7,7 +7,7 @@ CLASSES := $(addprefix $(BUILD_DIR)/, $(SOURCES:$(SRC_DIR)/%.java=%.class))
 
 NAME := jlox
 MAIN := org.yufengwng.lox.Lox
-JAVAC_OPTS := -source 1.8 -target 1.8
+JAVAC_OPTS := -Werror
 
 # Build the interpreter by default.
 default: jlox

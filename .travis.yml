@@ -8,5 +8,6 @@ install:
   - make test_suite
 
 script:
+  - jdk_switcher use openjdk8
   - make test
 
