@@ -35,8 +35,9 @@ endif
 
 # Download test suite from the book and put it in the right place.
 test_suite:
+	mkdir -p $(TEST_DIR)
 	git clone https://github.com/munificent/craftinginterpreters ci
-	mv ci/test $(TEST_DIR)
+	cp -r ci/test/* $(TEST_DIR)
 	rm -rf ci
 
 # Remove the test suite.
