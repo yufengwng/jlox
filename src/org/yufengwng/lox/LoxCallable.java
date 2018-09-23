@@ -6,5 +6,5 @@ interface LoxCallable {
 
     int arity();
 
-    Object call(Interpreter Interpreter, List<Object> arguments);
+    Object call(Interpreter interpreter, List<Object> arguments);
 }

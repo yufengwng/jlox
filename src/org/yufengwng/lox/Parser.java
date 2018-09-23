@@ -15,7 +15,7 @@ class Parser {
     private final List<Token> tokens;
     private int current = 0;
 
-    private enum FunParseType {
+    private enum FunctionType {
         FUNCTION, METHOD;
 
         @Override
@@ -38,8 +38,9 @@ class Parser {
 
     private Stmt tryDeclaration() {
         try {
-            if (match(FUN)) return function(FunParseType.FUNCTION);
-            if (match(VAR)) return finishVarDeclaration();
+            if (match(CLASS)) return finishClassDeclaration();
+            if (match(FUN))   return function(FunctionType.FUNCTION);
+            if (match(VAR))   return finishVarDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -47,7 +48,7 @@ class Parser {
         }
     }
 
-    private Stmt function(FunParseType funType) {
+    private Stmt.Function function(FunctionType funType) {
         Token name = consume(IDENT, "Expect " + funType + " name.");
         consume(PAREN_L, "Expect '(' after " + funType + " name.");
 
@@ -66,6 +67,19 @@ class Parser {
 
         List<Stmt> body = finishBlockStatement();
         return new Stmt.Function(name, parameters, body);
+    }
+
+    private Stmt finishClassDeclaration() {
+        Token name = consume(IDENT, "Expect class name.");
+        consume(BRACE_L, "Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!isAtEnd() && !check(BRACE_R)) {
+            methods.add(function(FunctionType.METHOD));
+        }
+
+        consume(BRACE_R, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt finishVarDeclaration() {
@@ -203,6 +217,9 @@ class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable) expr).name;
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get) expr;
+                return new Expr.Set(get.object, get.name, value);
             }
 
             error(equals, "Invalid assignment target.");
@@ -298,6 +315,9 @@ class Parser {
         while (true) {
             if (match(PAREN_L)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENT, "Expect property name after '.'.");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }
@@ -327,6 +347,10 @@ class Parser {
 
         if (match(NUM, STR)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(THIS)) {
+            return new Expr.This(previous());
         }
 
         if (match(IDENT)) {
