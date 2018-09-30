@@ -28,9 +28,9 @@ $(BUILD_DIR)/%.class: $(SRC_DIR)/%.java
 # Run interpreter against test suite with optional filters.
 test: jlox
 ifdef FILTERS
-	@ python3 util/test.py $(FILTERS)
+	@ python3 test.py $(FILTERS)
 else
-	@ python3 util/test.py
+	@ python3 test.py
 endif
 
 # Download test suite from the book and put it in the right place.

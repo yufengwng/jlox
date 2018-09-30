@@ -11,7 +11,7 @@ import re
 import sys
 
 
-REPO_DIR = dirname(dirname(realpath(__file__)))
+REPO_DIR = dirname(realpath(__file__))
 TEST_DIR = 'spec'
 
 OUTPUT_EXPECT = re.compile(r'// expect: ?(.*)')
