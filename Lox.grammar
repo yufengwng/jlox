@@ -1,4 +1,4 @@
-/* vim: ft=antlr4 */
+/* vim: set ft=antlr4: */
 
 grammar Lox;
 
